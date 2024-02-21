@@ -110,6 +110,54 @@ GO_gsea_analysis <- function(data, ontologies_terms, org_db = org.Mm.eg.db, eps 
 
 
 
+kegg_ora_analysis <- function(filtered_data, organism = "mmu", key_type = "ENSEMBL") {
+  
+  gene_ORA <- as.character(filtered_data$ID)
+  
+  entrez_ids <- mapIds(org.Mm.eg.db,
+                       keys = gene_ORA,
+                       column = "ENTREZID",
+                       keytype = key_type,
+                       multiVals = "first")
+  
+  
+  tryCatch({
+    kegg_results <- enrichKEGG(gene = entrez_ids, organism = organism, keyType = "ncbi-geneid")
+  }, error = function(e) {
+    cat("Error in KEGG ORA:", e$message, "\n")
+  })
+  return(kegg_results)
+}
+
+
+kegg_gsea_analysis <- function(data, organism = "mmu", key_type = "ENSEMBL", eps = 1e-300, pAdjustMethod = "BH") {
+  
+  data_sorted <- data %>%
+    filter(!duplicated(ID)) %>%
+    filter(!is.na(log2FC) & !is.na(ID) & !is.na(padj)) %>%
+    arrange(desc(log2FC))
+  gene_GSEA <- setNames(data_sorted$log2FC, data_sorted$ID)
+  
+  entrez_ids <- mapIds(org.Mm.eg.db,
+                       keys = names(gene_GSEA),
+                       column = "ENTREZID",
+                       keytype = key_type,
+                       multiVals = "first")
+  
+  # Créez un nouveau vecteur avec les identifiants Entrez mappés, mais conservez l'ordre de gene_GSEA
+  entrez_geneList <- setNames(gene_GSEA[names(gene_GSEA) %in% names(entrez_ids)], entrez_ids[names(gene_GSEA) %in% names(entrez_ids)])
+  
+  # Assurez-vous que le vecteur est trié en ordre décroissant
+  entrez_geneList_sorted <- sort(entrez_geneList, decreasing = TRUE)
+  
+  tryCatch({
+    gse_kegg_result <- gseKEGG(geneList = entrez_geneList_sorted, organism = organism, keyType = "ncbi-geneid", eps = eps, pAdjustMethod = pAdjustMethod)
+  }, error = function(e) {
+    cat("Error in KEGG GSEA:", e$message, "\n")
+  })
+}
+
+
 #################################################################################################################################################################################################################"
 
 
@@ -370,7 +418,7 @@ shinyServer(function(input, output) {
       
       
       
-      if ("ORA" %in% input$GoTermAnalysisType) {
+      if ("ORA" %in% GO_choix_analyse) {
        print("c'est good")
        data_test <- raw_data() 
        filtered_data_ora <- subset(data_test,padj <= seuil_pval & abs(log2FC) >= GO_seuil_fc)
@@ -381,13 +429,13 @@ shinyServer(function(input, output) {
          # Gardez uniquement les lignes avec log2FC < 0 pour les gènes sous-exprimés
          filtered_data_ora <- filtered_data_ora[filtered_data_ora$log2FC < 0, ]
        }
-       res_ora_globaux = GO_ora_analysis(filtered_data_ora,ontologies,org_db = org.Mm.eg.db,simplifyCutoff = 0.7)
+       res_GO_ora_globaux = GO_ora_analysis(filtered_data_ora,ontologies,org_db = org.Mm.eg.db,simplifyCutoff = 0.7)
       }
       
-      if ("GSEA" %in% input$GoTermAnalysisType) {
+      if ("GSEA" %in% GO_choix_analyse) {
         
        data_test <- raw_data() 
-       res_gsea_globaux = GO_gsea_analysis(data_test,ontologies,org_db = org.Mm.eg.db,simplifyCutoff = 0.7)
+       res_GO_gsea_globaux = GO_gsea_analysis(data_test,ontologies,org_db = org.Mm.eg.db,simplifyCutoff = 0.7)
        print("c'est good pour la GSEA")
        print(length(res_gsea_globaux))
        }
@@ -515,6 +563,45 @@ shinyServer(function(input, output) {
   #### Pas de height pour les box au moins elles vont s'adapter à la taille de la figure  quand on les intègrera 
   output$PathwayAnalysisBox <- renderUI({
     if (PathwayAnalysisReady()) {
+      
+      
+      pathways_choix_analyse <- input$PathwayAnalysisType
+      databases <- input$PathwayDatabase
+      
+      pathways_seuil_pval <- input$PathwaySliderP_val
+      pathways_seuil_fc <- input$PathwaySliderFoldChange
+      pathways_ora_option <- input$PathwayDegOptions
+      
+      
+      if ("ORA" %in% pathways_choix_analyse) {
+        print("c'est good")
+        data_test <- raw_data() 
+        filtered_data_ora_pathways <- subset(data_test,padj <= seuil_pval & abs(log2FC) >= GO_seuil_fc)
+        if (pathways_ora_option == "Over expressed DEG") {
+          # Gardez uniquement les lignes avec log2FC > 0 pour les gènes sur-exprimés
+          filtered_data_ora <- filtered_data_ora[filtered_data_ora$log2FC > 0, ]
+        } else if (pathways_ora_option == "Under expressed DEG") {
+          # Gardez uniquement les lignes avec log2FC < 0 pour les gènes sous-exprimés
+          filtered_data_ora <- filtered_data_ora[filtered_data_ora$log2FC < 0, ]
+        }
+        res_kegg_ora = kegg_ora_analysis(filtered_data, organism = "mmu", key_type = "ENSEMBL")
+      }
+      
+      if ("GSEA" %in% pathways_choix_analyse) {
+        
+        data_test <- raw_data() 
+        res_kegg_gsea = kegg_gsea_analysis(data_test,organism = "mmu", key_type = "ENSEMBL", eps = 1e-300, pAdjustMethod = "BH")
+        print("c'est good pour la GSEA")
+      }
+      
+      
+      
+      
+      
+      
+      
+      
+      
       if ("ORA" %in% input$PathwayAnalysisType && "GSEA" %in% input$PathwayAnalysisType) {
         fluidRow(
           # Remplacez ceci par le contenu que vous souhaitez afficher dans la box
