@@ -32,7 +32,7 @@ ontologies_associations <- list(
 
 
 #################################################################################################################################################################################################################"
-ora_analysis <- function(filtered_data, ontologies_terms, org_db = org.Mm.eg.db, simplifyCutoff = 0.7) {
+GO_ora_analysis <- function(filtered_data, ontologies_terms, org_db = org.Mm.eg.db, simplifyCutoff = 0.7) {
   
   # Mappage ENSEMBL à Entrez
   entrez_ids <- mapIds(org_db,
@@ -67,7 +67,7 @@ ora_analysis <- function(filtered_data, ontologies_terms, org_db = org.Mm.eg.db,
 }
 
 
-gsea_analysis <- function(data, ontologies_terms, org_db = org.Mm.eg.db, eps = 1e-300, pAdjustMethod = "BH",simplifyCutoff = 0.7) {
+GO_gsea_analysis <- function(data, ontologies_terms, org_db = org.Mm.eg.db, eps = 1e-300, pAdjustMethod = "BH",simplifyCutoff = 0.7) {
   data_sorted <- data %>%
     filter(!duplicated(ID)) %>%
     filter(!is.na(log2FC) & !is.na(ID) & !is.na(padj)) %>%
@@ -361,27 +361,33 @@ shinyServer(function(input, output) {
   output$GoTermAnalysisBox <- renderUI({
     if (GoAnalysisReady()) {
       
-      choix_analyse <- input$GoTermAnalysisType
-      print(choix_analyse)
+      GO_choix_analyse <- input$GoTermAnalysisType
       ontologies <- input$OntologiesSelect
       
-      seuil_pval <- input$GoTermSliderP_val
-      seuil_fc <- input$GoTermSliderFoldChange
-      ora_option <- input$GoTermDegOptions
+      GO_seuil_pval <- input$GoTermSliderP_val
+      GO_seuil_fc <- input$GoTermSliderFoldChange
+      GO_ora_option <- input$GoTermDegOptions
       
       
       
       if ("ORA" %in% input$GoTermAnalysisType) {
        print("c'est good")
        data_test <- raw_data() 
-       filtered_data_ora <- subset(data_test,padj <= seuil_pval & abs(log2FC) >= seuil_fc) 
-       res_ora_globaux = ora_analysis(filtered_data_ora,ontologies,org_db = org.Mm.eg.db,simplifyCutoff = 0.7)
+       filtered_data_ora <- subset(data_test,padj <= seuil_pval & abs(log2FC) >= GO_seuil_fc)
+       if (GO_ora_option == "Over expressed DEG") {
+         # Gardez uniquement les lignes avec log2FC > 0 pour les gènes sur-exprimés
+         filtered_data_ora <- filtered_data_ora[filtered_data_ora$log2FC > 0, ]
+       } else if (GO_ora_option == "Under expressed DEG") {
+         # Gardez uniquement les lignes avec log2FC < 0 pour les gènes sous-exprimés
+         filtered_data_ora <- filtered_data_ora[filtered_data_ora$log2FC < 0, ]
+       }
+       res_ora_globaux = GO_ora_analysis(filtered_data_ora,ontologies,org_db = org.Mm.eg.db,simplifyCutoff = 0.7)
       }
       
       if ("GSEA" %in% input$GoTermAnalysisType) {
         
        data_test <- raw_data() 
-       res_gsea_globaux = gsea_analysis(data_test,ontologies,org_db = org.Mm.eg.db,simplifyCutoff = 0.7)
+       res_gsea_globaux = GO_gsea_analysis(data_test,ontologies,org_db = org.Mm.eg.db,simplifyCutoff = 0.7)
        print("c'est good pour la GSEA")
        print(length(res_gsea_globaux))
        }
@@ -389,7 +395,7 @@ shinyServer(function(input, output) {
       
       
       
-      if ("ORA" %in% choix_analyse && "GSEA" %in% choix_analyse) {
+      if ("ORA" %in% GO_choix_analyse && "GSEA" %in% GO_choix_analyse) {
         fluidRow(
           box(title = "BarPlot", id = "GoTermOraGseaBarplotBox", width = 12, solidHeader = TRUE, status = 'primary',
               fluidRow(
@@ -425,7 +431,7 @@ shinyServer(function(input, output) {
           shinyjs::disable("GoTermAnalysisType"),
           shinyjs::disable("OntologiesSelect")
         ) }
-      else if ("ORA" %in% choix_analyse) { 
+      else if ("ORA" %in% GO_choix_analyse) { 
         fluidRow(
           box(title = "BarPlot", id = "GoTermBarplotBox", width = 12, solidHeader = TRUE, status = 'primary',
               # Contenu de la boîte des résultats ici
@@ -447,7 +453,7 @@ shinyServer(function(input, output) {
           shinyjs::disable("GoTermAnalysisType"),
           shinyjs::disable("OntologiesSelect")
         ) } 
-      else if ("GSEA" %in% choix_analyse) { 
+      else if ("GSEA" %in% GO_choix_analyse) { 
         fluidRow( 
           box(title = "BarPlot", id = "GoTermGseaBarplotBox", width = 12, solidHeader = TRUE, status = 'primary',
               plotOutput("barplot2")
