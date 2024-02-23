@@ -39,10 +39,11 @@ shinyUI(
         #Il y a plusieurs icon disponible sur cette librairie : https://getbootstrap.com/docs/3.4/components/#glyphicons 
         # Il y a aussi une autre librairie https://fontawesome.com/icons/categories qui s'appelle font-awesome
         # Pour les utiliser on doit indiquer la librairie utilisée suivie de l'icon
-        menuItem("Whole Data Inspection", tabName = "WholeDataInspect", icon = icon("database", lib = "font-awesome"), 
-                 badgeLabel = "News", badgeColor = "green"),
-        menuItem("Go Term Enrichment", tabName = "GoTermEnrichment", icon = icon("sitemap", lib = "font-awesome")), 
-        menuItem("Pathway Enrichment", tabName = "PathwayEnrichment", icon = icon("chart-pie", lib = "font-awesome")), 
+        menuItem("Whole Data Inspection", tabName = "WholeDataInspect", icon = icon("database", lib = "font-awesome")),
+        menuItem("Go Term Enrichment", tabName = "GoTermEnrichment", icon = icon("sitemap", lib = "font-awesome"), 
+                 badgeLabel = "News", badgeColor = "green"), 
+        menuItem("Pathway Enrichment", tabName = "PathwayEnrichment", icon = icon("chart-pie", lib = "font-awesome"), 
+                 badgeLabel = "News", badgeColor = "green"), 
         menuItem("About", tabName = "About", icon = icon("th", lib = "glyphicon"))
         )
     ),
