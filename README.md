@@ -1,18 +1,18 @@
-**General Presentation**
+# **General Presentation**
 
 Welcome to **NOM A METTRE,** your comprehensive solution for whole genome data analysis, Gene Ontology (GO) term enrichment, and pathway enrichment exploration. Designed with researchers and biologists in mind, our application facilitates the intricate process of analyzing genomic data, identifying significant GO terms, and uncovering enriched pathways to drive forward scientific discoveries and insights into gene functions, biological processes, and molecular interactions.
 
-**Core Features:**
+## **Core Features:**
 
 - **Whole Genome Data Inspection**: Our application specializes in the visual representation of gene expression data through detailed volcano plots, a powerful tool for quickly identifying genes that are significantly upregulated or downregulated. This feature is pivotal for researchers aiming to pinpoint genes that show differential expression under various conditions or treatments.
 - **GO Term Enrichment**: With an integrated Gene Ontology database, our platform allows for the efficient identification of enriched GO terms associated with your gene sets. This feature aids in understanding the functional implications of your genomic data, highlighting biological processes, cellular components, and molecular functions tied to your genes of interest.
 - **Pathway Enrichment Analysis**: Dive deeper into the biological pathways with our pathway enrichment feature. By linking genomic data to known pathways, users can uncover significant associations, predict molecular interactions, and gain insights into the underlying mechanisms of diseases or phenotypes.
 
-**Usage**
+# **Usage**
 
 Getting Started with **NOM A METTRE**. Our platform is designed to work seamlessly with data from **\[analyse à mettre à jour\],** provided in a CSV format. This section guides you through preparing your data file and navigating through the initial steps to analyze your data.
 
-**Preparing Your CSV File:**
+## **Preparing Your CSV File:**
 
 ·       **Source Your Data:** Begin by exporting your genomic data from **\[analyse à mettre à jour\]** into a CSV file. This step is crucial for ensuring that the data fed into **\[Nom de l'Application\]** is in the correct format for analysis.
 
@@ -36,11 +36,11 @@ Ensuring these columns are present and correctly labeled in your CSV file is ess
 
 &nbsp;
 
-**Upload Your Data:** With your CSV file prepared, navigate to the "Select a CSV file :" section. Here, you can upload your file directly into the application. Our platform includes verification mechanisms to check the integrity and format of your data, ensuring compatibility with our analysis tools.
+## **Upload Your Data:** With your CSV file prepared, navigate to the "Select a CSV file :" section. Here, you can upload your file directly into the application. Our platform includes verification mechanisms to check the integrity and format of your data, ensuring compatibility with our analysis tools.
 
 &nbsp;
 
-·        **Whole Data Inspection:** This section is instrumental for graphically filtering your data and offers the capability to display it in a table. It provides the flexibility to adjust two thresholds through sliders located in the option box:
+·       # **Whole Data Inspection:** This section is instrumental for graphically filtering your data and offers the capability to display it in a table. It provides the flexibility to adjust two thresholds through sliders located in the option box:
 
 **\-P-value cutoff**
 
@@ -50,7 +50,7 @@ It's important to note that changes to these sliders affect the plot and the tab
 
 If you are interested in a specific gene, the table includes a search function that allows you to quickly locate it. This feature enhances the usability of the application by enabling targeted inspection of genes of interest.
 
-·       **Go Term Enrichment :**
+·      # **Go Term Enrichment :**
 
 In the GO Term Enrichment section of our application, you have several parameters at your disposal to tailor the analysis to your needs. First, you can choose the type of analysis:
 
@@ -74,7 +74,7 @@ Once you've made your selections among the different types of analysis and ontol
 
 To initiate another type of analysis, simply click on "Clear Results" and make your new selection, allowing for seamless transition between different analytical approaches.
 
-·       **Pathway Enrichment :**
+·      # **Pathway Enrichment :**
 
 In the Pathway Enrichment section of our application, you have several parameters at your disposal to tailor the analysis to your needs. First, you can choose the type of analysis.
 
