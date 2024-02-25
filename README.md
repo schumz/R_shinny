@@ -11,6 +11,8 @@ Welcome to **NOM A METTRE,** your comprehensive solution for whole genome data a
 
 # **How to Download and Use**
 
+## With Docker 
+
 ### Step 1: Install Docker
 
 Before you begin, you need to have Docker installed on your machine. If you don't have Docker installed, please visit [Docker's official website](https://www.docker.com/) and follow the instructions to install Docker on your operating system.
@@ -35,6 +37,16 @@ After starting the application, open your web browser and go to the following UR
 
 ```bash
 http://localhost:3838
+```
+
+
+## Without Docker 
+
+Download ui.R , server.R files, and the www folder
+
+Run the application by executing: 
+```r
+runApp()
 ```
 
 # **Usage**
