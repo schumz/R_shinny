@@ -2,6 +2,13 @@
 
 Welcome to **NOM A METTRE,** your comprehensive solution for whole genome data analysis, Gene Ontology (GO) term enrichment, and pathway enrichment exploration. Designed with researchers and biologists in mind, our application facilitates the intricate process of analyzing genomic data, identifying significant GO terms, and uncovering enriched pathways to drive forward scientific discoveries and insights into gene functions, biological processes, and molecular interactions.
 
+
+## **Core Features:**
+
+- **Whole Genome Data Inspection**: Our application specializes in the visual representation of gene expression data through detailed volcano plots, a powerful tool for quickly identifying genes that are significantly upregulated or downregulated. This feature is pivotal for researchers aiming to pinpoint genes that show differential expression under various conditions or treatments.
+- **GO Term Enrichment**: With an integrated Gene Ontology database, our platform allows for the efficient identification of enriched GO terms associated with your gene sets. This feature aids in understanding the functional implications of your genomic data, highlighting biological processes, cellular components, and molecular functions tied to your genes of interest.
+- **Pathway Enrichment Analysis**: Dive deeper into the biological pathways with our pathway enrichment feature. By linking genomic data to known pathways, users can uncover significant associations, predict molecular interactions, and gain insights into the underlying mechanisms of diseases or phenotypes.
+
 # **How to Download and Use**
 
 ### Step 1: Install Docker
@@ -29,11 +36,6 @@ After starting the application, open your web browser and go to the following UR
 ```bash
 http://localhost:3838
 ```
-## **Core Features:**
-
-- **Whole Genome Data Inspection**: Our application specializes in the visual representation of gene expression data through detailed volcano plots, a powerful tool for quickly identifying genes that are significantly upregulated or downregulated. This feature is pivotal for researchers aiming to pinpoint genes that show differential expression under various conditions or treatments.
-- **GO Term Enrichment**: With an integrated Gene Ontology database, our platform allows for the efficient identification of enriched GO terms associated with your gene sets. This feature aids in understanding the functional implications of your genomic data, highlighting biological processes, cellular components, and molecular functions tied to your genes of interest.
-- **Pathway Enrichment Analysis**: Dive deeper into the biological pathways with our pathway enrichment feature. By linking genomic data to known pathways, users can uncover significant associations, predict molecular interactions, and gain insights into the underlying mechanisms of diseases or phenotypes.
 
 # **Usage**
 
