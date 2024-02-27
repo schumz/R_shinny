@@ -20,6 +20,11 @@ library(ggplot2)
 library(dplyr)
 library(DOSE)
 library(GOSemSim)
+library(ReactomePA)
+library(stats)
+
+conflicts(detail = TRUE)
+
 
 
 #################################################################################################################################################################################################################"
@@ -293,6 +298,88 @@ kegg_gsea_analysis <- function(data, organism = "mmu", key_type = "ENSEMBL", eps
     cat("Error in KEGG GSEA:", e$message, "\n")
   })
 }
+
+######################################################################
+###################### FONCTION REACTOME GSEA ANALYSIS ###############  
+######################################################################
+
+
+Reactome_GSEA_Analysis <- function(data, pvalueCutoff = 0.05, organism = "mouse") {
+  
+  # Lire, nettoyer, transformer et trier les données en une seule séquence d'opérations
+  data_sorted <- data%>%
+    filter(!duplicated(ID)) %>% #enleve les duplicats si il y en a
+    filter(!is.na(log2FC) & !is.na(ID) & !is.na(padj)) %>% #enleve les lignes avec des NaN
+    #mutate(ranking = -log10(padj) * log2FC) %>% # Ajoute une colonne ranking
+    arrange(desc(log2FC)) #tri par ordré décroissant par rapport au log2FC
+  
+  # Extraction des identifiants Ensembl
+  ensembl_ids_GSEA <- data_sorted$ID
+  
+  #Conversion en EntrezID
+  entrez_ids_GSEA <- mapIds(
+    org.Mm.eg.db, 
+    keys = ensembl_ids_GSEA, 
+    keytype = "ENSEMBL", 
+    column = "ENTREZID")
+  
+  # Ajout de la colonne EntrezID aux données triées
+  data_sorted <- data_sorted %>%
+    mutate(EntrezID = entrez_ids_GSEA)
+  
+  # Préparation de la liste de gènes pour GSEA
+  gene_list <- setNames(data_sorted$log2FC, data_sorted$EntrezID)
+  
+  #Analyse d'enrichissement de voies géniques par GSEA
+  reactome_results_GSEA <- gsePathway(geneList = gene_list, organism = organism, 
+                                      exponent = 1, 
+                                      nPerm = 1000,
+                                      pvalueCutoff = pvalueCutoff, 
+                                      pAdjustMethod = "BH", 
+                                      by = "fgsea")
+  
+  return(reactome_results_GSEA)
+}
+
+
+######################################################################
+###################### FONCTION REACTOME ORA ANALYSIS ###############  
+######################################################################
+
+Reactome_ORA_Analysis <- function(filtered_data, pvalueCutoff = 0.05, organism = "mouse") {
+  # Extraction des identifiants Ensembl
+  ensembl_ids_ORA <- filtered_data$ID
+  
+  #Conversion en EntrezID
+  entrez_ids_ORA <- mapIds(
+    org.Mm.eg.db, 
+    keys = ensembl_ids_ORA, 
+    keytype = "ENSEMBL", 
+    column = "ENTREZID")
+  
+  # Ajout de la colonne EntrezID aux données filtrées
+  filtered_data <- mutate(filtered_data, EntrezID = entrez_ids_ORA)
+  
+  # Extraction des noms de gènes
+  gene_ORA <- as.character(filtered_data$EntrezID)
+  
+  # Analyse d'enrichissement de voies (ORA)
+  reactome_results_ORA <- enrichPathway(gene = gene_ORA, 
+                                        organism = organism,
+                                        pvalueCutoff = pvalueCutoff,
+                                        pAdjustMethod = "BH",
+                                        qvalueCutoff = 0.05,
+                                        universe = NULL, 
+                                        minGSSize = 10, 
+                                        maxGSSize = 500,
+                                        readable = FALSE)
+  
+  return(reactome_results_ORA)
+}
+
+
+
+
 
     ######################################################################
     ################# FONCTION PATHWAY APPARITION DE BOX #################
@@ -752,7 +839,6 @@ shinyServer(function(input, output) {
       
       
       if ("ORA" %in% Pathways_choix_analyse) {
-        print("c'est good")
         data_test <- raw_data() 
         filtered_data_ora_pathways <- subset(data_test,padj <= Pathways_seuil_pval & abs(log2FC) >= Pathways_seuil_fc)
         if (Pathways_ora_option == "Over expressed DEG") {
@@ -762,14 +848,28 @@ shinyServer(function(input, output) {
           # Gardez uniquement les lignes avec log2FC < 0 pour les gènes sous-exprimés
           filtered_data_ora_pathways <- filtered_data_ora_pathways[filtered_data_ora_pathways$log2FC < 0, ]
         }
+        if ("KEGG" %in% Databases_Select){
+          print("ora kegg")
         res_kegg_ora = kegg_ora_analysis(filtered_data_ora_pathways, organism = "mmu", key_type = "ENSEMBL")
+        print(res_kegg_ora)}
+        
+        if ("Reactome" %in% Databases_Select){
+          print("ora reactome")
+          res_reactome_ora = Reactome_ORA_Analysis(filtered_data_ora_pathways, pvalueCutoff = 0.05, organism = "mouse")}
+        
       }
       
       if ("GSEA" %in% Pathways_choix_analyse) {
         
         data_test <- raw_data() 
-        res_kegg_gsea = kegg_gsea_analysis(data_test,organism = "mmu", key_type = "ENSEMBL", eps = 1e-300, pAdjustMethod = "BH")
-        print("c'est good pour la GSEA")
+        if ("KEGG" %in% Databases_Select){
+          print("gsea kegg")
+        res_kegg_gsea = kegg_gsea_analysis(data_test,organism = "mmu", key_type = "ENSEMBL", eps = 1e-300, pAdjustMethod = "BH")}
+        
+        if ("Reactome" %in% Databases_Select){
+          print("gsea reactome")
+        res_reactome_gsea =  Reactome_GSEA_Analysis(data_test, pvalueCutoff = 0.05, organism = "mouse")}
+
       }
       
       generatePathwayAnalysisBoxes(Databases_Select, Pathways_choix_analyse)
