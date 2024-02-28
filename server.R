@@ -1,10 +1,15 @@
-# Application Shiny v4
-# Créateur: Mathieu Zallio 
-# Email: mathieu.zallio@univ-rouen.fr
+# Application Shiny v6
+# Créateurs: Baptiste Herlemont
+#            Adam Schumacher
+#            Mathieu Zallio 
+# Email: baptiste.herlemont@univ-rouen.fr
+#        adam.schumacher@univ-rouen.fr
+#        mathieu.zallio@univ-rouen.fr
 # Université affiliée : Université de Rouen Normandie 
 
 library(shiny)
 library(shinydashboard)
+library(shinycssloaders)
 library(plotly)
 library(shinyalert)
 library(htmlwidgets)
@@ -43,9 +48,9 @@ ontologies_associations <- list(
 ####### FONCTIONS POUR GO TERM ENRICHMENT ########
         #################################
 
-    ######################################################################
-    ###################### FONCTION GO ORA ANALYSIS ######################
-    ######################################################################
+######################################################################
+###################### FONCTION GO ORA ANALYSIS ######################
+######################################################################
 GO_ora_analysis <- function(filtered_data, ontologies_terms, org_db = org.Mm.eg.db, simplifyCutoff = 0.7) {
   
   # Mappage ENSEMBL à Entrez
@@ -81,9 +86,9 @@ GO_ora_analysis <- function(filtered_data, ontologies_terms, org_db = org.Mm.eg.
 }
 
 
-    ######################################################################
-    ###################### FONCTION GO GSEA ANALYSIS #####################
-    ######################################################################
+######################################################################
+###################### FONCTION GO GSEA ANALYSIS #####################
+######################################################################
 GO_gsea_analysis <- function(data, ontologies_terms, org_db = org.Mm.eg.db, eps = 1e-300, pAdjustMethod = "BH",simplifyCutoff = 0.7) {
   data_sorted <- data %>%
     filter(!duplicated(ID)) %>%
@@ -124,9 +129,9 @@ GO_gsea_analysis <- function(data, ontologies_terms, org_db = org.Mm.eg.db, eps 
   return(simplified_results_list)
 }
 
-    ######################################################################
-    ################### FONCTION GO APPARITION DE BOX ####################
-    ######################################################################
+######################################################################
+################### FONCTION GO APPARITION DE BOX ####################
+######################################################################
 generateGoTermAnalysisBoxes <- function(ontologiesSelected, analysisTypes) {
   GOallUiElements <- list()
   
@@ -140,87 +145,87 @@ generateGoTermAnalysisBoxes <- function(ontologiesSelected, analysisTypes) {
     if("ORA" %in% analysisTypes && "GSEA" %in% analysisTypes) {
       # Ajoutez les box pour ORA et GSEA sans les envelopper dans un fluidRow ici
       GOallUiElements[[length(GOallUiElements) + 1]] <- fluidRow(box(title = paste("BarPlot"), 
-                                                                 id = paste("GoTermOraGseaBarplotBox", ontology, sep="_"), 
-                                                                 width = 12, solidHeader = TRUE, status = 'primary',
-                                                                 fluidRow(
-                                                                   column(6, plotOutput("barplot1")), # Pour le premier plot
-                                                                   column(6, plotOutput("barplot2"))  # Pour le deuxième plot
-                                                                 )),
-                                                             box(title = paste("CnetPlot"), 
-                                                                 id = paste("GoTermOraGseaCnetplotBox", ontology, sep="_"), 
-                                                                 width = 12, solidHeader = TRUE, status = 'primary',
-                                                                 fluidRow(
-                                                                   column(6, plotOutput("plot1")), # Pour le premier plot
-                                                                   column(6, plotOutput("plot2"))  # Pour le deuxième plot
-                                                                 )),
-                                                             box(title = paste("EmaPlot"), 
-                                                                 id = paste("GoTermOraGseaEmaplotBox", ontology, sep="_"), 
-                                                                 width = 12, solidHeader = TRUE, status = 'primary',
-                                                                 fluidRow(
-                                                                   column(6, plotOutput("plot3")), # Pour le premier plot
-                                                                   column(6, plotOutput("plot4"))  # Pour le deuxième plot
-                                                                 )),
-                                                             box(title = paste("DotPlot"), 
-                                                                 id = paste("GoTermOraGseaDotplotBox", ontology, sep="_"), 
-                                                                 width = 12, solidHeader = TRUE, status = 'primary',
-                                                                 fluidRow(
-                                                                   column(6, plotOutput("plot5")), # Pour le premier plot
-                                                                   column(6, plotOutput("plot6"))  # Pour le deuxième plot
-                                                                 )),
-                                                             box(title = paste("GoPlot & GseaPlot"), 
-                                                                 id = paste("GoTermGoGseaplotBox", ontology, sep="_"), 
-                                                                 width = 12, solidHeader = TRUE, status = 'primary',
-                                                                 fluidRow(
-                                                                   column(6, plotOutput("plot7")), # Pour le premier plot
-                                                                   column(6, plotOutput("plot8"))  # Pour le deuxième plot
-                                                                 ))
+                                                                     id = paste("GoTermOraGseaBarplotBox", ontology, sep="_"), 
+                                                                     width = 12, solidHeader = TRUE, status = 'primary',
+                                                                     fluidRow(
+                                                                       column(6, plotOutput("barplot1")), # Pour le premier plot
+                                                                       column(6, plotOutput("barplot2"))  # Pour le deuxième plot
+                                                                     )),
+                                                                 box(title = paste("CnetPlot"), 
+                                                                     id = paste("GoTermOraGseaCnetplotBox", ontology, sep="_"), 
+                                                                     width = 12, solidHeader = TRUE, status = 'primary',
+                                                                     fluidRow(
+                                                                       column(6, plotOutput("plot1")), # Pour le premier plot
+                                                                       column(6, plotOutput("plot2"))  # Pour le deuxième plot
+                                                                     )),
+                                                                 box(title = paste("EmaPlot"), 
+                                                                     id = paste("GoTermOraGseaEmaplotBox", ontology, sep="_"), 
+                                                                     width = 12, solidHeader = TRUE, status = 'primary',
+                                                                     fluidRow(
+                                                                       column(6, plotOutput("plot3")), # Pour le premier plot
+                                                                       column(6, plotOutput("plot4"))  # Pour le deuxième plot
+                                                                     )),
+                                                                 box(title = paste("DotPlot"), 
+                                                                     id = paste("GoTermOraGseaDotplotBox", ontology, sep="_"), 
+                                                                     width = 12, solidHeader = TRUE, status = 'primary',
+                                                                     fluidRow(
+                                                                       column(6, plotOutput("plot5")), # Pour le premier plot
+                                                                       column(6, plotOutput("plot6"))  # Pour le deuxième plot
+                                                                     )),
+                                                                 box(title = paste("GoPlot & GseaPlot"), 
+                                                                     id = paste("GoTermGoGseaplotBox", ontology, sep="_"), 
+                                                                     width = 12, solidHeader = TRUE, status = 'primary',
+                                                                     fluidRow(
+                                                                       column(6, plotOutput("plot7")), # Pour le premier plot
+                                                                       column(6, plotOutput("plot8"))  # Pour le deuxième plot
+                                                                     ))
       )
       
     } else if("ORA" %in% analysisTypes) {
       # Ajoutez les box pour ORA seulement
       GOallUiElements[[length(GOallUiElements) + 1]] <- fluidRow(box(title = paste("BarPlot"), 
-                                                                 id = paste("GoTermOraBarplotBox", ontology, sep="_"), 
-                                                                 width = 12, solidHeader = TRUE, status = 'primary',
-                                                                 plotOutput("barplot2")),
-                                                             box(title = paste("CnetPlot"), 
-                                                                 id = paste("GoTermOraCnetplotBox", ontology, sep="_"), 
-                                                                 width = 12, solidHeader = TRUE, status = 'primary',
-                                                                 plotOutput("plot2")),
-                                                             box(title = paste("EmaPlot"), 
-                                                                 id = paste("GoTermOraEmaplotBox", ontology, sep="_"), 
-                                                                 width = 12, solidHeader = TRUE, status = 'primary',
-                                                                 plotOutput("plot4")),
-                                                             box(title = paste("DotPlot"), 
-                                                                 id = paste("GoTermOraDotplotBox", ontology, sep="_"), 
-                                                                 width = 12, solidHeader = TRUE, status = 'primary',
-                                                                 plotOutput("plot6")),
-                                                             box(title = paste("GoPlot "), 
-                                                                 id = paste("GoTermGoplotBox", ontology, sep="_"), 
-                                                                 width = 12, solidHeader = TRUE, status = 'primary',
-                                                                 plotOutput("plot8"))
+                                                                     id = paste("GoTermOraBarplotBox", ontology, sep="_"), 
+                                                                     width = 12, solidHeader = TRUE, status = 'primary',
+                                                                     plotOutput("barplot2")),
+                                                                 box(title = paste("CnetPlot"), 
+                                                                     id = paste("GoTermOraCnetplotBox", ontology, sep="_"), 
+                                                                     width = 12, solidHeader = TRUE, status = 'primary',
+                                                                     plotOutput("plot2")),
+                                                                 box(title = paste("EmaPlot"), 
+                                                                     id = paste("GoTermOraEmaplotBox", ontology, sep="_"), 
+                                                                     width = 12, solidHeader = TRUE, status = 'primary',
+                                                                     plotOutput("plot4")),
+                                                                 box(title = paste("DotPlot"), 
+                                                                     id = paste("GoTermOraDotplotBox", ontology, sep="_"), 
+                                                                     width = 12, solidHeader = TRUE, status = 'primary',
+                                                                     plotOutput("plot6")),
+                                                                 box(title = paste("GoPlot "), 
+                                                                     id = paste("GoTermGoplotBox", ontology, sep="_"), 
+                                                                     width = 12, solidHeader = TRUE, status = 'primary',
+                                                                     plotOutput("plot8"))
       )
     } else if("GSEA" %in% analysisTypes) {
       # Ajoutez les box pour GSEA seulement
       GOallUiElements[[length(GOallUiElements) + 1]] <- fluidRow(box(title = paste("BarPlot"), 
-                                                                 id = paste("GoTermGseaBarplotBox", ontology, sep="_"), 
-                                                                 width = 12, solidHeader = TRUE, status = 'primary',
-                                                                 plotOutput("barplot1")),
-                                                             box(title = paste("CnetPlot"), 
-                                                                 id = paste("GoTermGseaCnetplotBox", ontology, sep="_"), 
-                                                                 width = 12, solidHeader = TRUE, status = 'primary',
-                                                                 plotOutput("plot1")),
-                                                             box(title = paste("EmaPlot"), 
-                                                                 id = paste("GoTermGseaEmaplotBox", ontology, sep="_"), 
-                                                                 width = 12, solidHeader = TRUE, status = 'primary',
-                                                                 plotOutput("plot3")),
-                                                             box(title = paste("DotPlot"), 
-                                                                 id = paste("GoTermGseaDotplotBox", ontology, sep="_"), 
-                                                                 width = 12, solidHeader = TRUE, status = 'primary',
-                                                                 plotOutput("plot5")),
-                                                             box(title = paste("GseaPlot"), 
-                                                                 id = paste("GoTermGseaplotBox", ontology, sep="_"), 
-                                                                 width = 12, solidHeader = TRUE, status = 'primary',
-                                                                 plotOutput("plot7"))
+                                                                     id = paste("GoTermGseaBarplotBox", ontology, sep="_"), 
+                                                                     width = 12, solidHeader = TRUE, status = 'primary',
+                                                                     plotOutput("barplot1")),
+                                                                 box(title = paste("CnetPlot"), 
+                                                                     id = paste("GoTermGseaCnetplotBox", ontology, sep="_"), 
+                                                                     width = 12, solidHeader = TRUE, status = 'primary',
+                                                                     plotOutput("plot1")),
+                                                                 box(title = paste("EmaPlot"), 
+                                                                     id = paste("GoTermGseaEmaplotBox", ontology, sep="_"), 
+                                                                     width = 12, solidHeader = TRUE, status = 'primary',
+                                                                     plotOutput("plot3")),
+                                                                 box(title = paste("DotPlot"), 
+                                                                     id = paste("GoTermGseaDotplotBox", ontology, sep="_"), 
+                                                                     width = 12, solidHeader = TRUE, status = 'primary',
+                                                                     plotOutput("plot5")),
+                                                                 box(title = paste("GseaPlot"), 
+                                                                     id = paste("GoTermGseaplotBox", ontology, sep="_"), 
+                                                                     width = 12, solidHeader = TRUE, status = 'primary',
+                                                                     plotOutput("plot7"))
       )
     }
     
@@ -229,8 +234,8 @@ generateGoTermAnalysisBoxes <- function(ontologiesSelected, analysisTypes) {
   
   # Désactivation les boutons et sélections après l'exécution
   GOallUiElements <- c(GOallUiElements, shinyjs::disable("GoTermRunButton"), 
-                     shinyjs::disable("GoTermAnalysisType"), 
-                     shinyjs::disable("OntologiesSelect"))
+                       shinyjs::disable("GoTermAnalysisType"), 
+                       shinyjs::disable("OntologiesSelect"))
   
   # Retournez tous les éléments UI en utilisant tagList pour les grouper sans ajouter de fluidRow supplémentaire
   do.call(tagList, GOallUiElements)
@@ -246,9 +251,9 @@ generateGoTermAnalysisBoxes <- function(ontologiesSelected, analysisTypes) {
         #################################
 
 
-    ######################################################################
-    ##################### FONCTION KEGG ORA ANALYSIS #####################
-    ######################################################################
+######################################################################
+##################### FONCTION KEGG ORA ANALYSIS #####################
+######################################################################
 kegg_ora_analysis <- function(filtered_data, organism = "mmu", key_type = "ENSEMBL") {
   
   gene_ORA <- as.character(filtered_data$ID)
@@ -269,9 +274,9 @@ kegg_ora_analysis <- function(filtered_data, organism = "mmu", key_type = "ENSEM
 }
 
 
-    ######################################################################
-    #################### FONCTION KEGG GSEA ANALYSIS #####################
-    ######################################################################
+######################################################################
+#################### FONCTION KEGG GSEA ANALYSIS #####################
+######################################################################
 kegg_gsea_analysis <- function(data, organism = "mmu", key_type = "ENSEMBL", eps = 1e-300, pAdjustMethod = "BH") {
   
   data_sorted <- data %>%
@@ -381,9 +386,9 @@ Reactome_ORA_Analysis <- function(filtered_data, pvalueCutoff = 0.05, organism =
 
 
 
-    ######################################################################
-    ################# FONCTION PATHWAY APPARITION DE BOX #################
-    ######################################################################
+######################################################################
+################# FONCTION PATHWAY APPARITION DE BOX #################
+######################################################################
 
 generatePathwayAnalysisBoxes <- function(database_selected, PathanalysisTypes) {
   # Initialisez une liste vide pour contenir tous les éléments UI
@@ -608,7 +613,7 @@ shinyServer(function(input, output) {
         return(p)
       })
       ############################################################################################################
-
+      
       ######################## Génération des Outputs #############################
       #On va réutiliser les variables réactives crées auparavant 
       
@@ -749,7 +754,7 @@ shinyServer(function(input, output) {
     GoAnalysisReady(TRUE)  # Indiquer que l'analyse est prête
   })
   
- 
+  
   #### Pas de height pour les box au moins elles vont s'adapter à la taille de la figure  quand on les intègrera 
   output$GoTermAnalysisBox <- renderUI({
     if (GoAnalysisReady()) {
@@ -764,26 +769,26 @@ shinyServer(function(input, output) {
       
       
       if ("ORA" %in% GO_choix_analyse) {
-       print("c'est good")
-       data_test <- raw_data() 
-       filtered_data_ora <- subset(data_test,padj <= GO_seuil_pval & abs(log2FC) >= GO_seuil_fc)
-       if (GO_ora_option == "Over expressed DEG") {
-         # Gardez uniquement les lignes avec log2FC > 0 pour les gènes sur-exprimés
-         filtered_data_ora <- filtered_data_ora[filtered_data_ora$log2FC > 0, ]
-       } else if (GO_ora_option == "Under expressed DEG") {
-         # Gardez uniquement les lignes avec log2FC < 0 pour les gènes sous-exprimés
-         filtered_data_ora <- filtered_data_ora[filtered_data_ora$log2FC < 0, ]
-       }
-       res_GO_ora_globaux = GO_ora_analysis(filtered_data_ora,Ontologies_Selected,org_db = org.Mm.eg.db,simplifyCutoff = 0.7)
+        print("c'est good")
+        data_test <- raw_data() 
+        filtered_data_ora <- subset(data_test,padj <= GO_seuil_pval & abs(log2FC) >= GO_seuil_fc)
+        if (GO_ora_option == "Over expressed DEG") {
+          # Gardez uniquement les lignes avec log2FC > 0 pour les gènes sur-exprimés
+          filtered_data_ora <- filtered_data_ora[filtered_data_ora$log2FC > 0, ]
+        } else if (GO_ora_option == "Under expressed DEG") {
+          # Gardez uniquement les lignes avec log2FC < 0 pour les gènes sous-exprimés
+          filtered_data_ora <- filtered_data_ora[filtered_data_ora$log2FC < 0, ]
+        }
+        res_GO_ora_globaux = GO_ora_analysis(filtered_data_ora,Ontologies_Selected,org_db = org.Mm.eg.db,simplifyCutoff = 0.7)
       }
       
       if ("GSEA" %in% GO_choix_analyse) {
         
-       data_test <- raw_data() 
-       res_GO_gsea_globaux = GO_gsea_analysis(data_test,Ontologies_Selected,org_db = org.Mm.eg.db,simplifyCutoff = 0.7)
-       print("c'est good pour la GSEA")
-       print(length(res_GO_gsea_globaux))
-       }
+        data_test <- raw_data() 
+        res_GO_gsea_globaux = GO_gsea_analysis(data_test,Ontologies_Selected,org_db = org.Mm.eg.db,simplifyCutoff = 0.7)
+        print("c'est good pour la GSEA")
+        print(length(res_GO_gsea_globaux))
+      }
       
       generateGoTermAnalysisBoxes(Ontologies_Selected, GO_choix_analyse)
       
@@ -803,7 +808,7 @@ shinyServer(function(input, output) {
   #############################################################################################################################################################################################################################################################"
   #############################################################################################################################################################################################################################################################"
   #############################################################################################################################################################################################################################################################"
- 
+  
   
   #############################################################################################################################################################################################################################################################"
   ######################################################## PARTIE PATHWAY ANALYSIS: CHECK DU COCHAGE POUR ANALYSE + APPARITION DES BOXS (VIDES POUR L'INSTANT) ##############################################################################"
@@ -850,13 +855,14 @@ shinyServer(function(input, output) {
         }
         if ("KEGG" %in% Databases_Select){
           print("ora kegg")
-        res_kegg_ora = kegg_ora_analysis(filtered_data_ora_pathways, organism = "mmu", key_type = "ENSEMBL")
-        print(res_kegg_ora)}
+          res_kegg_ora = kegg_ora_analysis(filtered_data_ora_pathways, organism = "mmu", key_type = "ENSEMBL")
+          print(res_kegg_ora)}
         
         if ("Reactome" %in% Databases_Select){
           print("ora reactome")
           res_reactome_ora = Reactome_ORA_Analysis(filtered_data_ora_pathways, pvalueCutoff = 0.05, organism = "mouse")}
-        
+          print(res_reactome_ora)
+
       }
       
       if ("GSEA" %in% Pathways_choix_analyse) {
@@ -864,12 +870,12 @@ shinyServer(function(input, output) {
         data_test <- raw_data() 
         if ("KEGG" %in% Databases_Select){
           print("gsea kegg")
-        res_kegg_gsea = kegg_gsea_analysis(data_test,organism = "mmu", key_type = "ENSEMBL", eps = 1e-300, pAdjustMethod = "BH")}
-        
+          res_kegg_gsea = kegg_gsea_analysis(data_test,organism = "mmu", key_type = "ENSEMBL", eps = 1e-300, pAdjustMethod = "BH")}
+          print(res_kegg_gsea)
         if ("Reactome" %in% Databases_Select){
           print("gsea reactome")
-        res_reactome_gsea =  Reactome_GSEA_Analysis(data_test, pvalueCutoff = 0.05, organism = "mouse")}
-
+          res_reactome_gsea =  Reactome_GSEA_Analysis(data_test, pvalueCutoff = 0.05, organism = "mouse")}
+          print(res_reactome_gsea)
       }
       
       generatePathwayAnalysisBoxes(Databases_Select, Pathways_choix_analyse)

@@ -1,10 +1,16 @@
-# Application Shiny v4
-# Créateur: Mathieu Zallio 
-# Email: mathieu.zallio@univ-rouen.fr
+# Application Shiny v6
+# Créateurs: Baptiste Herlemont
+#            Adam Schumacher
+#            Mathieu Zallio 
+# Email: baptiste.herlemont@univ-rouen.fr
+#        adam.schumacher@univ-rouen.fr
+#        mathieu.zallio@univ-rouen.fr
 # Université affiliée : Université de Rouen Normandie 
+
 
 library(shiny)
 library(shinydashboard)
+library(shinycssloaders)
 library(plotly)
 library(shinyalert)
 library(htmlwidgets)
@@ -154,7 +160,7 @@ shinyUI(
                 )
               ),
               
-              uiOutput("GoTermAnalysisBox")
+              uiOutput("GoTermAnalysisBox") %>% withSpinner(color="#0dc5c1",  type = 6)
               
       ),
         tabItem(tabName = "PathwayEnrichment",
@@ -189,7 +195,7 @@ shinyUI(
                   )
                 ),
                 
-                uiOutput("PathwayAnalysisBox")
+                uiOutput("PathwayAnalysisBox")%>% withSpinner(color="blue",  type = 6)
                 
         ),
         tabItem(tabName = "About",
@@ -198,7 +204,7 @@ shinyUI(
                 br(),
                 div(
                   style = "font-size: 18px;",
-                  tags$p(shiny::strong("Version :"), "3.0"),
+                  tags$p(shiny::strong("Version :"), "6.0"),
                   tags$p(shiny::strong("Creators :"), "Baptiste Herlemont / Adam Schumacher / Mathieu Zallio"),
                   tags$p(shiny::strong("Email :"), "baptiste.herlemont@univ-rouen.fr / adam.schumacher@univ-rouen.fr / mathieu.zallio@univ-rouen.fr"),
                   tags$p(shiny::strong("University :"), "Université de Rouen Normandie ")
