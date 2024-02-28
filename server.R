@@ -862,6 +862,7 @@ shinyServer(function(input, output) {
           print("ora reactome")
           res_reactome_ora = Reactome_ORA_Analysis(filtered_data_ora_pathways, pvalueCutoff = 0.05, organism = "mouse")}
           print(res_reactome_ora)
+
       }
       
       if ("GSEA" %in% Pathways_choix_analyse) {
@@ -875,7 +876,6 @@ shinyServer(function(input, output) {
           print("gsea reactome")
           res_reactome_gsea =  Reactome_GSEA_Analysis(data_test, pvalueCutoff = 0.05, organism = "mouse")}
           print(res_reactome_gsea)
-        
       }
       
       generatePathwayAnalysisBoxes(Databases_Select, Pathways_choix_analyse)
