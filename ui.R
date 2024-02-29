@@ -50,7 +50,8 @@ shinyUI(
                              badgeLabel = "News", badgeColor = "green"), 
                     menuItem("Pathway Enrichment", tabName = "PathwayEnrichment", icon = icon("chart-pie", lib = "font-awesome"), 
                              badgeLabel = "News", badgeColor = "green"), 
-                    menuItem("About", tabName = "About", icon = icon("th", lib = "glyphicon"))
+                    menuItem("About", tabName = "About", icon = icon("th", lib = "glyphicon")),
+                    menuItem("Documentation", tabName = "Documentation", icon = icon("book", lib = "font-awesome"))
                   )
                 ),
                 
