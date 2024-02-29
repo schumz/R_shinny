@@ -7,6 +7,8 @@
 #        mathieu.zallio@univ-rouen.fr
 # Université affiliée : Université de Rouen Normandie 
 
+install.packages(graphlayouts)
+
 library(shiny)
 library(shinydashboard)
 library(shinycssloaders)
@@ -44,9 +46,9 @@ ontologies_associations <- list(
 ############################################################## PARTIE CREATION DE FONCTIONS UTILISABLES #########################################################################################################"
 #################################################################################################################################################################################################################"
 
-        #################################
+#################################
 ####### FONCTIONS POUR GO TERM ENRICHMENT ########
-        #################################
+#################################
 
 ######################################################################
 ###################### FONCTION GO ORA ANALYSIS ######################
@@ -246,9 +248,9 @@ generateGoTermAnalysisBoxes <- function(ontologiesSelected, analysisTypes) {
 
 
 
-        #################################
+#################################
 ####### FONCTIONS POUR PATHWAY ENRICHMENT ########
-        #################################
+#################################
 
 
 ######################################################################
@@ -511,12 +513,34 @@ generatePathwayAnalysisBoxes <- function(database_selected, PathanalysisTypes) {
 
 
 
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
   raw_data <- reactiveVal()
   #############################################################################################################################################################################################################################################################"
   ######################################################## PARTIE WHOLE DATA INSPECTION: CHECK DE L'INPUT + VOLCANOPLOT + DOWNLOAD + ACTIVATION DES BOUTONS RUN DE GO ET PATHWAY ##############################################################################"
   #############################################################################################################################################################################################################################################################"
+
   
+  
+  
+  
+  observeEvent(input$link_whole_genome, {
+    updateTabsetPanel(session, "WholeDataInspect")
+  })
+  
+  
+  observeEvent(input$link_go_term, {
+    updateTabItems(session, "GoTermEnrichment")
+  })
+  
+  observeEvent(input$link_pathway_enrichment, {
+    updateTabItems(session, "PathwayEnrichment")
+  }) 
+  
+  
+  
+  
+  
+    
   #Lorsque l'on va "observer l'évènement " : un fichier a été mis dans le fileUpload, on va analyser le fichier
   observeEvent(input$fileUpload, {
     #ici, on vérifie que le fichier est bien upload, puis on le lit avec des lignes de commandes R classiques
@@ -861,8 +885,8 @@ shinyServer(function(input, output) {
         if ("Reactome" %in% Databases_Select){
           print("ora reactome")
           res_reactome_ora = Reactome_ORA_Analysis(filtered_data_ora_pathways, pvalueCutoff = 0.05, organism = "mouse")}
-          print(res_reactome_ora)
-
+        print(res_reactome_ora)
+        
       }
       
       if ("GSEA" %in% Pathways_choix_analyse) {
@@ -871,11 +895,11 @@ shinyServer(function(input, output) {
         if ("KEGG" %in% Databases_Select){
           print("gsea kegg")
           res_kegg_gsea = kegg_gsea_analysis(data_test,organism = "mmu", key_type = "ENSEMBL", eps = 1e-300, pAdjustMethod = "BH")}
-          print(res_kegg_gsea)
+        print(res_kegg_gsea)
         if ("Reactome" %in% Databases_Select){
           print("gsea reactome")
           res_reactome_gsea =  Reactome_GSEA_Analysis(data_test, pvalueCutoff = 0.05, organism = "mouse")}
-          print(res_reactome_gsea)
+        print(res_reactome_gsea)
       }
       
       generatePathwayAnalysisBoxes(Databases_Select, Pathways_choix_analyse)
