@@ -155,7 +155,7 @@ shinyUI(
                                            img(src = "go-logo.large.png", height = "100%", width = "100%")
                                     )
                                   ),
-                                  selectInput("GoTermAdjustmentMethod", "Adjustment method", choices = c("Bonferroni", "Another Method")),
+                                  selectInput("GoTermAdjustmentMethod", "Adjustment method", choices = c("Benjamini-Hochberg","Benjamini-Yekutieli", "Bonferroni","Contrôle du FDR", "Hochberg", "Holm", "Hommel","Aucun ajustement")),
                                   
                                   ######AJOUT D'UN BOUTON RUN ET CLEAR
                                   
@@ -193,7 +193,7 @@ shinyUI(
                                            img(src = "Reactome_Imagotype_Positive_100mm.png", height = "66%", width = "66%")
                                     )
                                   ),
-                                  selectInput("PathwayAdjustmentMethod", "Adjustment method", choices = c("Bonferroni", "Another Method")),
+                                  selectInput("PathwayAdjustmentMethod", "Adjustment method", choices = c("Benjamini-Hochberg","Benjamini-Yekutieli", "Bonferroni","Contrôle du FDR", "Hochberg", "Holm", "Hommel","Aucun ajustement")),
                                   
                                   ######AJOUT D'UN BOUTON RUN ET CLEAR
                                   actionButton("PathwayRunButton","Run Analysis", icon = icon("step-forward", lib = "glyphicon"), disabled = TRUE),
