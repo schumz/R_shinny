@@ -40,6 +40,17 @@ ontologies_associations <- list(
   "Cellular component" = "CC"
 )
 
+methodes_ajustement <- list(
+  "Holm" = "holm",
+  "Hochberg" = "hochberg",
+  "Hommel" = "hommel",
+  "Bonferroni" = "bonferroni",
+  "Benjamini-Hochberg" = "BH",
+  "Benjamini-Yekutieli" = "BY",
+  "Contrôle du FDR" = "fdr",
+  "Aucun ajustement" = "none"
+)
+
 #################################################################################################################################################################################################################"
 ############################################################## PARTIE CREATION DE FONCTIONS UTILISABLES #########################################################################################################"
 #################################################################################################################################################################################################################"
@@ -51,7 +62,7 @@ ontologies_associations <- list(
 ######################################################################
 ###################### FONCTION GO ORA ANALYSIS ######################
 ######################################################################
-GO_ora_analysis <- function(filtered_data, ontologies_terms, org_db = org.Mm.eg.db, simplifyCutoff = 0.7) {
+GO_ora_analysis <- function(filtered_data, ontologies_terms, pajust_method, org_db = org.Mm.eg.db, simplifyCutoff = 0.7) {
   
   # Mappage ENSEMBL à Entrez
   entrez_ids <- mapIds(org_db,
@@ -71,7 +82,7 @@ GO_ora_analysis <- function(filtered_data, ontologies_terms, org_db = org.Mm.eg.
     
     
     tryCatch({
-      go_results <- enrichGO(gene = entrez_ids, OrgDb = org_db, keyType = "ENTREZID", ont = ont)
+      go_results <- enrichGO(gene = entrez_ids, OrgDb = org_db, keyType = "ENTREZID", ont = ont, pAdjustMethod=pajust_method)
       go_results_simplified <- simplify(go_results, cutoff = simplifyCutoff)
       
       # Ajouter les résultats simplifiés à la liste
@@ -89,7 +100,7 @@ GO_ora_analysis <- function(filtered_data, ontologies_terms, org_db = org.Mm.eg.
 ######################################################################
 ###################### FONCTION GO GSEA ANALYSIS #####################
 ######################################################################
-GO_gsea_analysis <- function(data, ontologies_terms, org_db = org.Mm.eg.db, eps = 1e-300, pAdjustMethod = "BH",simplifyCutoff = 0.7) {
+GO_gsea_analysis <- function(data, ontologies_terms, pajust_method,  org_db = org.Mm.eg.db, eps = 1e-300,simplifyCutoff = 0.7) {
   data_sorted <- data %>%
     filter(!duplicated(ID)) %>%
     filter(!is.na(log2FC) & !is.na(ID) & !is.na(padj)) %>%
@@ -117,7 +128,7 @@ GO_gsea_analysis <- function(data, ontologies_terms, org_db = org.Mm.eg.db, eps 
     print(message)
     
     tryCatch({
-      gse_go_result <- gseGO(geneList = gene_GSEA_sorted, ont = ont, keyType = "ENTREZID", OrgDb = org_db, eps = eps, pAdjustMethod = pAdjustMethod)
+      gse_go_result <- gseGO(geneList = gene_GSEA_sorted, ont = ont, keyType = "ENTREZID", OrgDb = org_db, eps = eps, pAdjustMethod = pajust_method)
       gse_go_results_simplified <- simplify(gse_go_result, cutoff = simplifyCutoff)
       
       simplified_results_list[[term]] <- gse_go_results_simplified
@@ -230,7 +241,7 @@ generateGoTermAnalysisBoxes <- function(ontologiesSelected, analysisTypes) {
 ######################################################################
 ##################### FONCTION KEGG ORA ANALYSIS #####################
 ######################################################################
-kegg_ora_analysis <- function(filtered_data, organism = "mmu", key_type = "ENSEMBL") {
+kegg_ora_analysis <- function(filtered_data, pajust_method, organism = "mmu", key_type = "ENSEMBL") {
   
   gene_ORA <- as.character(filtered_data$ID)
   
@@ -242,7 +253,7 @@ kegg_ora_analysis <- function(filtered_data, organism = "mmu", key_type = "ENSEM
   
   
   tryCatch({
-    kegg_results <- enrichKEGG(gene = entrez_ids, organism = organism, keyType = "ncbi-geneid")
+    kegg_results <- enrichKEGG(gene = entrez_ids, organism = organism, keyType = "ncbi-geneid",pAdjustMethod=pajust_method)
   }, error = function(e) {
     cat("Error in KEGG ORA:", e$message, "\n")
   })
@@ -253,7 +264,7 @@ kegg_ora_analysis <- function(filtered_data, organism = "mmu", key_type = "ENSEM
 ######################################################################
 #################### FONCTION KEGG GSEA ANALYSIS #####################
 ######################################################################
-kegg_gsea_analysis <- function(data, organism = "mmu", key_type = "ENSEMBL", eps = 1e-300, pAdjustMethod = "BH") {
+kegg_gsea_analysis <- function(data, pajust_method, organism = "mmu", key_type = "ENSEMBL", eps = 1e-300, pAdjustMethod = "BH") {
   
   data_sorted <- data %>%
     filter(!duplicated(ID)) %>%
@@ -274,7 +285,7 @@ kegg_gsea_analysis <- function(data, organism = "mmu", key_type = "ENSEMBL", eps
   entrez_geneList_sorted <- sort(entrez_geneList, decreasing = TRUE)
   
   tryCatch({
-    gse_kegg_result <- gseKEGG(geneList = entrez_geneList_sorted, organism = organism, keyType = "ncbi-geneid", eps = eps, pAdjustMethod = pAdjustMethod)
+    gse_kegg_result <- gseKEGG(geneList = entrez_geneList_sorted, organism = organism, keyType = "ncbi-geneid", eps = eps, pAdjustMethod = pajust_method)
   }, error = function(e) {
     cat("Error in KEGG GSEA:", e$message, "\n")
   })
@@ -285,7 +296,7 @@ kegg_gsea_analysis <- function(data, organism = "mmu", key_type = "ENSEMBL", eps
 ######################################################################
 
 
-Reactome_GSEA_Analysis <- function(data, pvalueCutoff = 0.05, organism = "mouse") {
+Reactome_GSEA_Analysis <- function(data, pajust_method, pvalueCutoff = 0.05, organism = "mouse") {
   
   # Lire, nettoyer, transformer et trier les données en une seule séquence d'opérations
   data_sorted <- data%>%
@@ -316,7 +327,7 @@ Reactome_GSEA_Analysis <- function(data, pvalueCutoff = 0.05, organism = "mouse"
                                       exponent = 1, 
                                       nPerm = 1000,
                                       pvalueCutoff = pvalueCutoff, 
-                                      pAdjustMethod = "BH", 
+                                      pAdjustMethod = pajust_method, 
                                       by = "fgsea")
   
   return(reactome_results_GSEA)
@@ -327,7 +338,7 @@ Reactome_GSEA_Analysis <- function(data, pvalueCutoff = 0.05, organism = "mouse"
 ###################### FONCTION REACTOME ORA ANALYSIS ###############  
 ######################################################################
 
-Reactome_ORA_Analysis <- function(filtered_data, pvalueCutoff = 0.05, organism = "mouse") {
+Reactome_ORA_Analysis <- function(filtered_data, pajust_method, pvalueCutoff = 0.05, organism = "mouse") {
   # Extraction des identifiants Ensembl
   ensembl_ids_ORA <- filtered_data$ID
   
@@ -348,7 +359,7 @@ Reactome_ORA_Analysis <- function(filtered_data, pvalueCutoff = 0.05, organism =
   reactome_results_ORA <- enrichPathway(gene = gene_ORA, 
                                         organism = organism,
                                         pvalueCutoff = pvalueCutoff,
-                                        pAdjustMethod = "BH",
+                                        pAdjustMethod = pajust_method,
                                         qvalueCutoff = 0.05,
                                         universe = NULL, 
                                         minGSSize = 10, 
@@ -702,6 +713,8 @@ shinyServer(function(input, output, session) {
       GO_seuil_pval <- input$GoTermSliderP_val
       GO_seuil_fc <- input$GoTermSliderFoldChange
       GO_ora_option <- input$GoTermDegOptions
+      GO_ajust_method <- methodes_ajustement[[input$GoTermAdjustmentMethod]]
+
       
       
       
@@ -716,7 +729,7 @@ shinyServer(function(input, output, session) {
           # Gardez uniquement les lignes avec log2FC < 0 pour les gènes sous-exprimés
           filtered_data_ora <- filtered_data_ora[filtered_data_ora$log2FC < 0, ]
         }
-        res_GO_ora_globaux = GO_ora_analysis(filtered_data_ora,Ontologies_Selected,org_db = org.Mm.eg.db,simplifyCutoff = 0.7)
+        res_GO_ora_globaux = GO_ora_analysis(filtered_data_ora, Ontologies_Selected, pajust_method=GO_ajust_method ,org_db = org.Mm.eg.db,simplifyCutoff = 0.7)
         print(res_GO_ora_globaux)
         
         ##### AJOUT DU 19 MARS #########
@@ -764,7 +777,7 @@ shinyServer(function(input, output, session) {
       if ("GSEA" %in% GO_choix_analyse) {
         
         data_test <- raw_data() 
-        res_GO_gsea_globaux = GO_gsea_analysis(data_test,Ontologies_Selected,org_db = org.Mm.eg.db,simplifyCutoff = 0.7)
+        res_GO_gsea_globaux = GO_gsea_analysis(data_test, Ontologies_Selected, pajust_method=GO_ajust_method , org_db = org.Mm.eg.db,simplifyCutoff = 0.7)
         print("c'est good pour la GSEA")
         print(res_GO_gsea_globaux)
            
@@ -869,6 +882,7 @@ shinyServer(function(input, output, session) {
       Pathways_seuil_pval <- input$PathwaySliderP_val
       Pathways_seuil_fc <- input$PathwaySliderFoldChange
       Pathways_ora_option <- input$PathwayDegOptions
+      Pathways_ajust_method <- methodes_ajustement[[input$PathwayAdjustmentMethod]]
       
       
       if ("ORA" %in% Pathways_choix_analyse) {
@@ -883,12 +897,12 @@ shinyServer(function(input, output, session) {
         }
         if ("KEGG" %in% Databases_Select){
           print("ora kegg")
-          res_kegg_ora = kegg_ora_analysis(filtered_data_ora_pathways, organism = "mmu", key_type = "ENSEMBL")
+          res_kegg_ora = kegg_ora_analysis(filtered_data_ora_pathways, pajust_method = Pathways_ajust_method, organism = "mmu", key_type = "ENSEMBL")
           print(res_kegg_ora)}
         
         if ("Reactome" %in% Databases_Select){
           print("ora reactome")
-          res_reactome_ora = Reactome_ORA_Analysis(filtered_data_ora_pathways, pvalueCutoff = 0.05, organism = "mouse")
+          res_reactome_ora = Reactome_ORA_Analysis(filtered_data_ora_pathways, pajust_method = Pathways_ajust_method, pvalueCutoff = 0.05, organism = "mouse")
           print(res_reactome_ora)}
         
       }
@@ -898,11 +912,11 @@ shinyServer(function(input, output, session) {
         data_test <- raw_data() 
         if ("KEGG" %in% Databases_Select){
           print("gsea kegg")
-          res_kegg_gsea = kegg_gsea_analysis(data_test,organism = "mmu", key_type = "ENSEMBL", eps = 1e-300, pAdjustMethod = "BH")}
+          res_kegg_gsea = kegg_gsea_analysis(data_test, pajust_method = Pathways_ajust_method  ,organism = "mmu", key_type = "ENSEMBL", eps = 1e-300, pAdjustMethod = "BH")}
         print(res_kegg_gsea)
         if ("Reactome" %in% Databases_Select){
           print("gsea reactome")
-          res_reactome_gsea =  Reactome_GSEA_Analysis(data_test, pvalueCutoff = 0.05, organism = "mouse")
+          res_reactome_gsea =  Reactome_GSEA_Analysis(data_test, pajust_method = Pathways_ajust_method, pvalueCutoff = 0.05, organism = "mouse")
           print(res_reactome_gsea)}
       }
       
